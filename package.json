@@ -1,5 +1,6 @@
 {
   "name": "@divyenduz/ts-graphql-plugin",
+  "repository": "github:divyenduz/ts-graphql-plugin",
   "version": "0.0.1",
   "description": "",
   "main": "out/index.js",
