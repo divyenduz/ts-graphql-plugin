@@ -5,7 +5,7 @@
   "main": "out/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/tsc -p .",
+    "build": "rimraf out && ./node_modules/.bin/tsc -p .",
     "watch": "./node_modules/.bin/tsc --watch -p ."
   },
   "author": "",
