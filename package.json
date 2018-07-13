@@ -1,6 +1,6 @@
 {
   "name": "@divyenduz/ts-graphql-plugin",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "",
   "main": "out/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "watch": "tsc --watch -p ."
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@divyenduz/graphql-language-service-interface": "1.2.5",
     "@divyenduz/graphql-language-service-server": "1.2.3",

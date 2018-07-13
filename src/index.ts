@@ -15,7 +15,7 @@ export = (mod: { typescript: typeof ts }) => {
         info.languageService,
         new GraphQLLanguageServiceProxy(info, logger),
         {
-          tags: ["gql"],
+          tags: ["gql", "graphql"],
           enableForStringWithSubstitutions: false
         }
       );
