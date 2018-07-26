@@ -6,7 +6,9 @@ export = (mod: { typescript: typeof ts }) => {
   return {
     create(info: ts.server.PluginCreateInfo): ts.LanguageService {
       const logger = (msg: string) =>
-        info.project.projectService.logger.info(`[ts-graphql-plugin] ${msg}`);
+        info.project.projectService.logger.info(
+          `[ts-graphql-plugin-log]: ${msg}`
+        );
       logger(`create function called`);
       return decorateWithTemplateLanguageService(
         mod.typescript,
