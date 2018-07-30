@@ -7,7 +7,8 @@ import {
   getAutocompleteSuggestions,
   getDiagnostics
 } from "@divyenduz/graphql-language-service-interface";
-import { getGraphQLConfig } from "graphql-config";
+import { getGraphQLConfig, GraphQLProjectConfig } from "graphql-config";
+import { dirname } from "path";
 
 export default class GraphQLLanguageServiceProxy
   implements TemplateLanguageService {
@@ -26,7 +27,7 @@ export default class GraphQLLanguageServiceProxy
     Use the configration of first project if heuristics failed 
     to find one.
   */
-  patchProjectConfig(config) {
+  patchProjectConfig(config): GraphQLProjectConfig {
     if (!config.config.projects) {
       return config;
     }
@@ -37,16 +38,40 @@ export default class GraphQLLanguageServiceProxy
     return null;
   }
 
+  isRootDir(path: string): boolean {
+    return dirname(path) === path;
+  }
+
+  getProjectConfig(fileName: string): GraphQLProjectConfig {
+    let config = getGraphQLConfig();
+
+    let currentDir = dirname(fileName);
+    this._logger(`fileName: ${fileName}`)
+    this._logger(`currentDir: ${currentDir}`)
+    while (!this.isRootDir(currentDir)) {
+      try {
+        config = getGraphQLConfig(currentDir);
+        this._logger(`Found GraphQL Config for ${currentDir}`);
+        break;
+      } catch (e) {
+        this._logger(`Failed to find GraphQL Config for ${currentDir}`);
+      }
+      currentDir = dirname(currentDir)
+    }
+
+    let projectConfig = config.getConfigForFile(fileName);
+    if (!projectConfig) {
+      projectConfig = this.patchProjectConfig(config);
+    }
+    return projectConfig;
+  }
+
   getCompletionsAtPosition(
     context: TemplateContext,
     position: ts.LineAndCharacter
   ): ts.CompletionInfo {
     try {
-      const config = getGraphQLConfig();
-      let projectConfig = config.getConfigForFile(context.fileName);
-      if (!projectConfig) {
-        projectConfig = this.patchProjectConfig(config);
-      }
+      const projectConfig = this.getProjectConfig(context.fileName);
       const schema = projectConfig.getSchema();
       const completions = getAutocompleteSuggestions(
         schema,
@@ -83,11 +108,7 @@ export default class GraphQLLanguageServiceProxy
 
   getSemanticDiagnostics?(context: TemplateContext): ts.Diagnostic[] {
     try {
-      const config = getGraphQLConfig();
-      let projectConfig = config.getConfigForFile(context.fileName);
-      if (!projectConfig) {
-        projectConfig = this.patchProjectConfig(config);
-      }
+      const projectConfig = this.getProjectConfig(context.fileName);
       const schema = projectConfig.getSchema();
       const diagnostics = getDiagnostics(context.text, schema);
       this._logger(`diagnostics: ${JSON.stringify(diagnostics)}`);
